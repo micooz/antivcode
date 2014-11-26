@@ -1,0 +1,6 @@
+Debug/
+Release/
+Resource/
+*.suo
+*.sdf
+*.opensdf
