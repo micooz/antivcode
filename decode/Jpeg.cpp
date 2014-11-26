@@ -11,7 +11,7 @@ Jpeg::Jpeg(const std::string &file)
 
     fopen_s(&_pf, file.c_str(), "rb");
     if (_pf == nullptr) {
-        throw "file not Found.";
+        throw std::exception("file not found.");
     }
     jpeg_stdio_src(&_info, _pf);
     jpeg_read_header(&_info, true);

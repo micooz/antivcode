@@ -31,6 +31,10 @@ CharSet
 Decoder::decode(const std::string &file) {
     SliceCollection *col = _db->load();
 
+    if (col->empty()) {
+        throw std::exception("database empty");
+    }
+
     std::shared_ptr<IImage> target(new Jpeg(file));
     CharSet result;
 

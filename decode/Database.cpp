@@ -57,7 +57,8 @@ SliceCollection*
 Database::load() {
     if (_collection) {
         if (!_collection->empty())
-            save();
+            //    save();
+            return _collection;
     } else {
         _collection = new SliceCollection;
     }
