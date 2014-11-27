@@ -76,6 +76,7 @@ int main(int argc, char **argv) {
         ("directory,d", value<string>(), "directory where vcode images saved in")
         ("file,f", value<string>(), "vcode image path")
         ("database,b", value<string>()->default_value("./db"), "database file path")
+        ("test,t", "run test procedure,require -d")
         ("newdb,n", "create new database")
         ("savetmp,v", "save binaryzated file");
 
@@ -165,10 +166,17 @@ int main(int argc, char **argv) {
                 } else if (vm.count("directory")) {
                     //for batch recognition
                     string dir = vm["directory"].as<string>();
-
                     if (!fs::exists(fs::path(dir))) {
                         throw std::exception("directory not found.");
                     }
+                    //whether run a test procedure
+                    bool testproc = vm.count("test");
+                    clock_t time_start = 0;
+                    if (testproc) {
+                        time_start = clock();
+                    }
+                    //traversal the folder
+                    int right_count = 0, sumfile = 0;
                     fs::recursive_directory_iterator beg(dir);
                     fs::recursive_directory_iterator end;
                     for (; beg != end; beg++) {
@@ -178,8 +186,22 @@ int main(int argc, char **argv) {
 
                             CharSet result = decoder->decode(file);
 
-                            cout << file << "---->" << result << endl;
+                            if (std::string(result.begin(), result.end())
+                                == fs::basename(fs::path(file))) {
+                                right_count++;
+                            }
+                            sumfile++;
+
+                            cout << file << " ----> " << result << endl;
                         }
+                    }
+                    if (testproc) {
+                        cout << "\nright/sum: " << right_count << "/"
+                            << sumfile << " = " << (double) right_count / sumfile << endl;
+                        clock_t now = clock();
+
+                        cout << "duration: " << (now - time_start) << " ms\taverage: "
+                            << (now - time_start) / sumfile << " ms" << endl;
                     }
                     break;
                 }//if

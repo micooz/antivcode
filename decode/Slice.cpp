@@ -117,11 +117,14 @@ Slice::similarTo(Slice &slice) {
         if (sc[i]) {
             if (sc[i] == tc[i])
                 eq_true++;
+            //else
+            //eq_true--;
             total_true++;
         }
     }
-
-    return (float) eq_true / total_true;
+    //if (eq_true < 0) eq_true = 0;
+    return (float) eq_true / std::fmin(slen, tlen);
+    //return (float) eq_true / total_true;
 }
 
 void
