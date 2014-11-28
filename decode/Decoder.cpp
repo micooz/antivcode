@@ -4,12 +4,6 @@
 #include "Jpeg.h"
 #include "Database.h"
 
-std::ostream&
-operator<<(std::ostream &out, const  CharSet &charset) {
-    out << std::string(charset.begin(), charset.end());
-    return out;
-}
-
 Decoder::Decoder(const std::string &dbpath)
     :_db(nullptr) {
 
