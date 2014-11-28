@@ -1,8 +1,4 @@
-/* ansi2knr.c */
-/* Convert ANSI C function definitions to K&R ("traditional C") syntax */
-
-/*
-ansi2knr is distributed in the hope that it will be useful, but WITHOUT ANY
+/* ansi2knr is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY.  No author or distributor accepts responsibility to anyone for the
 consequences of using it or for whether it serves any particular purpose or
 works at all, unless he says so in writing.  Refer to the GNU General Public

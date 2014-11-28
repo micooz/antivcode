@@ -26,7 +26,8 @@ Decoder::decode(const std::string &file) {
     SliceCollection *col = _db->load();
 
     if (col->empty()) {
-        throw std::exception("database empty");
+		std::logic_error ex("database empty");
+        throw std::exception(ex);
     }
 
     std::shared_ptr<IImage> target(new Jpeg(file));

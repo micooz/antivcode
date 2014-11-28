@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <memory>
+#include <fstream>
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 #include "IImage.h"
@@ -88,9 +89,9 @@ void recognite(std::shared_ptr<Decoder> decoder, const string &file,
     //for test procedure
     if (testproc) {
         if (string(charset.begin(), charset.end()) == fs::basename(fs::path(file))) {
-            cout << " ¡Ì ";
+            cout << " âˆš ";
         } else {
-            cout << " ¡Á ";
+            cout << " Ã— ";
         }
         clock_t now = clock();
         cout << "duration: " << (now - time_start) << " ms" << endl;
@@ -233,8 +234,9 @@ int main(int argc, char **argv) {
                 if (vm.count("file")) {
                     //for single file
                     string file = vm["file"].as<string>();
-                    recognite(decoder, file, &vm, [&] (const CharSet& charset) {
-                        cout << file << " ----> " << charset;
+                    recognite(decoder, file, &vm, [&] (const CharSet &charset) {
+                        cout << file << " ----> ";
+						cout << charset;
                     });
                     break;
                 } else if (vm.count("directory")) {
@@ -255,7 +257,8 @@ int main(int argc, char **argv) {
                             string file = beg->path().string();
 
                             recognite(decoder, file, &vm, [&] (const CharSet &charset) {
-                                cout << file << " ----> " << charset << endl;
+                                cout << file << " ----> ";
+								cout << charset << endl;
                                 if (std::string(charset.begin(), charset.end())
                                     == fs::basename(fs::path(file))) {
                                     right_count++;
@@ -283,3 +286,4 @@ int main(int argc, char **argv) {
 
     return 0;
 }
+

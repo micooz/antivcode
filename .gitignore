@@ -6,3 +6,6 @@ Release/
 *.opensdf
 *.diagsession
 *.vspx
+*.o
+*.a
+decode

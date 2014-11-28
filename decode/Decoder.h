@@ -2,6 +2,7 @@
 #define _DECODER_H_
 
 #include <string>
+#include <exception>
 
 class Database;
 

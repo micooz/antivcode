@@ -17,7 +17,7 @@ uint16_t depth) {
     _width = width;
     _depth = depth;
 
-    fopen_s(&_pFile, file.c_str(), "wb");
+    _pFile = fopen(file.c_str(), "wb");
     write_bmp_header();
     write_bmp_data();
     fclose(_pFile);

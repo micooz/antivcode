@@ -9,9 +9,10 @@ Jpeg::Jpeg(const std::string &file)
     _info.err = jpeg_std_error(&_jerr);
     jpeg_create_decompress(&_info);
 
-    fopen_s(&_pf, file.c_str(), "rb");
+    _pf = fopen(file.c_str(), "rb");
     if (_pf == nullptr) {
-        throw std::exception("file not found.");
+		std::logic_error ex("file not found.");
+        throw std::exception(ex);
     }
     jpeg_stdio_src(&_info, _pf);
     jpeg_read_header(&_info, true);
