@@ -244,7 +244,7 @@ int main(int argc, char **argv) {
                             string file = beg->path().string();
 
                             recognite(decoder, file, &vm, [&] (const CharSet &charset) {
-                                cout << file << " ----> " << charset;
+                                cout << file << " ----> " << charset << endl;
                                 if (std::string(charset.begin(), charset.end())
                                     == fs::basename(fs::path(file))) {
                                     right_count++;
