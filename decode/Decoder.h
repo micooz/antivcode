@@ -14,7 +14,7 @@ public:
 
     CharSet decode(const std::string &file);
 
-    friend std::ostream& operator<<(std::ostream &out, CharSet &charset);
+    friend std::ostream& operator<<(std::ostream &out, const CharSet &charset);
 private:
     Database *_db;
 };

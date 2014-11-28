@@ -107,24 +107,19 @@ Slice::similarTo(Slice &slice) {
     AttributeCode tc = this->getCode();
     size_t slen = sc.size();
     size_t tlen = tc.size();
-    size_t eq_true = 0;
-    size_t total = slen, total_true = 0;
+    int eq_true = 0;
+    size_t total = slen;
 
     for (size_t i = 0; i < total; ++i) {
         //to prevent cross-border
         if (i >= tlen)
             break;
-        if (sc[i]) {
-            if (sc[i] == tc[i])
-                eq_true++;
-            //else
-            //eq_true--;
-            total_true++;
+        if (sc.at(i)) {
+            if (sc.at(i) == tc.at(i))
+                ++eq_true;
         }
     }
-    //if (eq_true < 0) eq_true = 0;
-    return (float) eq_true / std::fmin(slen, tlen);
-    //return (float) eq_true / total_true;
+    return (float) eq_true / ((slen < tlen) ? tlen : slen);// std::fmin(slen, tlen);
 }
 
 void
@@ -144,8 +139,7 @@ Slice::~Slice() {
 }
 
 std::ostream &
-operator<<(std::ostream &out, Slice &slice) {
-    AttributeCode code = slice.getCode();
+operator<<(std::ostream &out, const AttributeCode &code) {
     for (auto c : code)
         out << c;
     out << std::endl;

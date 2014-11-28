@@ -4,3 +4,5 @@ Release/
 *.suo
 *.sdf
 *.opensdf
+*.diagsession
+*.vspx

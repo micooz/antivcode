@@ -5,7 +5,7 @@
 #include "Database.h"
 
 std::ostream&
-operator<<(std::ostream &out, CharSet &charset) {
+operator<<(std::ostream &out, const  CharSet &charset) {
     out << std::string(charset.begin(), charset.end());
     return out;
 }
@@ -48,24 +48,30 @@ Decoder::decode(const std::string &file) {
     //iterate target slices
     for (size_t i = 0; i < len; i++) {
         auto tsc = tcol->at(i);
-        //iterate database
-        bool found = false;
 
-        std::shared_ptr<Slice> max;
-        max = col->at(0);
+        std::shared_ptr<Slice> max = col->at(0);
 
         float lastr = 0.0f;
-        float maxr = tsc->similarTo(*max);
+        float maxr = 0.0f;// tsc->similarTo(*max);
 
         size_t dblen = col->size();
-
-        for (size_t k = 1; k < dblen; ++k) {
+        //iterate database
+        for (size_t k = 0; k < dblen; ++k) {
             lastr = tsc->similarTo(*col->at(k));
             if (lastr > maxr) {
                 maxr = lastr;
                 max = col->at(k);
             }
+            //#ifdef _DEBUG
+            //            std::cout << "compared with " << col->at(k)->getSymbol() << " in db, rate = " << lastr << std::endl;
+            //#endif
         }
+        //#ifdef _DEBUG
+        //        std::cout << "\nhit at " << max->getSymbol() << " " << maxr << std::endl;
+        //        std::cout << "tc    " << tsc->getCode() << std::endl;
+        //        std::cout << "sc(" << max->getSymbol() << ") " << max->getCode() << std::endl;
+        //        std::cout << std::endl;
+        //#endif
 
         result.push_back(max->getSymbol());
     }

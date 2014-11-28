@@ -36,7 +36,7 @@ public:
     float similarTo(Slice &slice);
 
     //output AttributeCode as a string
-    friend std::ostream& operator<<(std::ostream &out, Slice &slice);
+    friend std::ostream& operator<<(std::ostream &out,const AttributeCode &code);
 private:
     AttributeCode _code;
     uint32_t _x1, _x2;

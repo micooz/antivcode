@@ -24,9 +24,7 @@ void study(const string& file, std::shared_ptr<Study> sd, const variables_map *v
 
     if (vm->count("byname")) {
         string fname = fs::basename(fs::path(file));
-
         strcpy_s(buf, sizeof(buf), fname.c_str());
-
     } else {
         cout << "please input the characters you saw: " << endl;
 
@@ -62,6 +60,82 @@ void study(const string& file, std::shared_ptr<Study> sd, const variables_map *v
     }
 }
 
+void recognite(std::shared_ptr<Decoder> decoder, const string &file,
+               const variables_map *vm, const std::function<void(const CharSet &)> callback) {
+    //check the file type
+    string extension = fs::extension(fs::path(file));
+    if (extension != ".jpg" && extension != ".jpeg") {
+        throw std::exception("invalid image format.");
+    }
+    //for test procedure
+    bool testproc = (vm->count("test")) ? true : false;
+    clock_t time_start = 0;
+    if (testproc) {
+        time_start = clock();
+    }
+    //start decoding
+    CharSet charset = decoder->decode(file);
+
+    callback(charset);
+    //for test procedure
+    if (testproc) {
+        if (string(charset.begin(), charset.end()) == fs::basename(fs::path(file))) {
+            cout << " ¡Ì ";
+        } else {
+            cout << " ¡Á ";
+        }
+        clock_t now = clock();
+        cout << "duration: " << (now - time_start) << " ms" << endl;
+    }
+}
+
+class examples {
+public:
+    static examples* getInstance() {
+        static examples *_obj = nullptr;
+        static gc _gc;
+
+        if (!_obj) {
+            _obj = new examples;
+        }
+        return _obj;
+    }
+
+    friend std::ostream& operator<<(std::ostream &out, const examples *obj) {
+        for (auto line : obj->_text) {
+            out << line << std::endl;
+        }
+        return out;
+    }
+private:
+    examples() {
+        _text.reserve(30);
+        ifstream in(_file, ios::in | ios::binary);
+        
+        string buf;
+        if (in) {
+            while (!in.eof()) {
+                std::getline(in, buf);
+                _text.push_back(buf);
+            }
+            in.close();
+        }
+    }
+
+    class gc {
+    public:
+        ~gc() {
+            examples *pIns = examples::getInstance();
+            if (pIns) {
+                delete pIns;
+                pIns = nullptr;
+            }
+        }
+    };
+    vector<string> _text;
+    const string _file = "./examples";
+};
+
 int main(int argc, char **argv) {
 
 #if defined (WIN32) || (_WIN32)
@@ -71,16 +145,14 @@ int main(int argc, char **argv) {
     boost::program_options::options_description opts("decode Usage");
     opts.add_options()
         ("help,h", "show help information")
-        ("study,s", "auto create char map database,require -d or -f")
+        ("study,s", "auto create char map database, require -d or -f")
         ("byname,y", "study by filename without input manually")
         ("directory,d", value<string>(), "directory where vcode images saved in")
         ("file,f", value<string>(), "vcode image path")
         ("database,b", value<string>()->default_value("./db"), "database file path")
-        ("test,t", "run test procedure,require -d")
+        ("test,t", "run test procedure, require -d or -f")
         ("newdb,n", "create new database")
-        ("savetmp,v", "save binaryzated file");
-
-    const char *examples = "\nexamples:\n\tdecode -syn -d ./folder/ -b ./database/db\n";
+        ("savetmp,v", "save binaryzated file, require -s");
 
     variables_map vm;
     try {
@@ -96,7 +168,7 @@ int main(int argc, char **argv) {
         do {
             //show help
             if (vm.count("help")) {
-                cout << opts << examples << endl;
+                cout << opts << examples::getInstance() << endl;
                 break;
             }
 
@@ -115,8 +187,6 @@ int main(int argc, char **argv) {
                 }
 
                 std::shared_ptr<Study> sd(new Study(dbpath));
-
-                bool savetmp = (vm.count("savetmp")) ? true : false;
 
                 if (vm.count("directory")) {
                     fs::path dir(vm["directory"].as<string>());
@@ -153,27 +223,15 @@ int main(int argc, char **argv) {
                 if (vm.count("file")) {
                     //for single file
                     string file = vm["file"].as<string>();
-
-                    string extension = fs::extension(fs::path(file));
-                    if (extension != ".jpg" && extension != ".jpeg") {
-                        throw std::exception("invalid image format.");
-                    }
-
-                    CharSet result = decoder->decode(file);
-                    cout << result;
-
+                    recognite(decoder, file, &vm, [&] (const CharSet& charset) {
+                        cout << file << " ----> " << charset;
+                    });
                     break;
                 } else if (vm.count("directory")) {
                     //for batch recognition
                     string dir = vm["directory"].as<string>();
                     if (!fs::exists(fs::path(dir))) {
                         throw std::exception("directory not found.");
-                    }
-                    //whether run a test procedure
-                    bool testproc = vm.count("test");
-                    clock_t time_start = 0;
-                    if (testproc) {
-                        time_start = clock();
                     }
                     //traversal the folder
                     int right_count = 0, sumfile = 0;
@@ -182,32 +240,29 @@ int main(int argc, char **argv) {
                     for (; beg != end; beg++) {
                         string extension = fs::extension(fs::path(*beg));
                         if (extension == ".jpg" || extension == ".jpeg") {
+
                             string file = beg->path().string();
 
-                            CharSet result = decoder->decode(file);
+                            recognite(decoder, file, &vm, [&] (const CharSet &charset) {
+                                cout << file << " ----> " << charset;
+                                if (std::string(charset.begin(), charset.end())
+                                    == fs::basename(fs::path(file))) {
+                                    right_count++;
+                                }
+                                //cout << "\taverage: " << (now - time_start) / sumfile << " ms" << endl;
+                            });
 
-                            if (std::string(result.begin(), result.end())
-                                == fs::basename(fs::path(file))) {
-                                right_count++;
-                            }
                             sumfile++;
-
-                            cout << file << " ----> " << result << endl;
                         }
                     }
-                    if (testproc) {
-                        cout << "\nright/sum: " << right_count << "/"
-                            << sumfile << " = " << (double) right_count / sumfile << endl;
-                        clock_t now = clock();
+                    cout << "\nright/sum: " << right_count << "/"
+                        << sumfile << " = " << (double) right_count / sumfile << endl;
 
-                        cout << "duration: " << (now - time_start) << " ms\taverage: "
-                            << (now - time_start) / sumfile << " ms" << endl;
-                    }
                     break;
                 }//if
             }
 
-            cout << opts << examples << endl;
+            cout << opts << examples::getInstance() << endl;
 
         } while (false);
 

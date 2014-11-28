@@ -105,6 +105,9 @@
     <ClInclude Include="Study.h" />
     <ClInclude Include="typedef.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="examples" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
