@@ -49,7 +49,7 @@ Slice::Slice(const Slice& slice) {
 
     _data = new byte[pixels * 3];
     //make deep copy
-    memcpy_s(_data, pixels * 3, slice._data, pixels * 3);
+    memcpy(_data, slice._data, pixels * 3);
 }
 
 uint32_t

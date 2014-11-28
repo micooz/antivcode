@@ -5,9 +5,10 @@
 #endif
 
 #include <iostream>
-#include <filesystem>
 #include <memory>
+#include <fstream>
 #include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
 #include "IImage.h"
 #include "Jpeg.h"
 #include "Study.h"
@@ -16,7 +17,12 @@
 using namespace std;
 using namespace boost::program_options;
 
-namespace fs = std::tr2::sys;
+namespace fs = boost::filesystem;
+
+std::ostream& operator<<(std::ostream &out, const CharSet &charset) {
+        out << std::string(charset.begin(), charset.end());
+        return out;
+}
 
 void study(const string& file, std::shared_ptr<Study> sd, const variables_map *vm) {
     char buf[10];
@@ -24,11 +30,11 @@ void study(const string& file, std::shared_ptr<Study> sd, const variables_map *v
 
     if (vm->count("byname")) {
         string fname = fs::basename(fs::path(file));
-        strcpy_s(buf, sizeof(buf), fname.c_str());
+        strcpy(buf, fname.c_str());
     } else {
         cout << "please input the characters you saw: " << endl;
 
-        string fullpath = fs::system_complete(fs::path(file));
+        string fullpath = fs::system_complete(fs::path(file)).string();
         string command = string("start ").append(fullpath);
         system(command.c_str());
 
@@ -52,8 +58,10 @@ void study(const string& file, std::shared_ptr<Study> sd, const variables_map *v
         std::cout << "error characters[\"" << buf << "\"] length(right is " << psc->size() << "), please try again(q to quit): " << endl;
         std::cin.clear();
         std::cin >> buf;
-        if (buf[0] == 'q' && buf[1] == 0)
-            throw std::exception("user abort.");
+        if (buf[0] == 'q' && buf[1] == 0) {
+            std::logic_error ex("user abort.");
+            throw std::exception(ex);
+        }
     }
     for (size_t i = 0; i < psc->size(); i++) {
         sd->confirm(psc->at(i), buf[i]);
@@ -65,7 +73,8 @@ void recognite(std::shared_ptr<Decoder> decoder, const string &file,
     //check the file type
     string extension = fs::extension(fs::path(file));
     if (extension != ".jpg" && extension != ".jpeg") {
-        throw std::exception("invalid image format.");
+        std::logic_error ex("invalid image format.");
+        throw std::exception(ex);
     }
     //for test procedure
     bool testproc = (vm->count("test")) ? true : false;
@@ -80,9 +89,9 @@ void recognite(std::shared_ptr<Decoder> decoder, const string &file,
     //for test procedure
     if (testproc) {
         if (string(charset.begin(), charset.end()) == fs::basename(fs::path(file))) {
-            cout << " ¡Ì ";
+            cout << " âˆš ";
         } else {
-            cout << " ¡Á ";
+            cout << " Ã— ";
         }
         clock_t now = clock();
         cout << "duration: " << (now - time_start) << " ms" << endl;
@@ -111,7 +120,7 @@ private:
     examples() {
         _text.reserve(30);
         ifstream in(_file, ios::in | ios::binary);
-        
+
         string buf;
         if (in) {
             while (!in.eof()) {
@@ -175,7 +184,8 @@ int main(int argc, char **argv) {
             //study process
             if (vm.count("study")) {
                 if (!(vm.count("directory") || vm.count("file"))) {
-                    throw std::exception("-d or -f must be set.");
+                    std::logic_error ex("-d or -f must be set.");
+                    throw std::exception(ex);
                 }
 
                 fs::path dbpath(vm["database"].as<string>());
@@ -186,7 +196,7 @@ int main(int argc, char **argv) {
                     }
                 }
 
-                std::shared_ptr<Study> sd(new Study(dbpath));
+                std::shared_ptr<Study> sd(new Study(dbpath.string()));
 
                 if (vm.count("directory")) {
                     fs::path dir(vm["directory"].as<string>());
@@ -215,7 +225,8 @@ int main(int argc, char **argv) {
             //recognition process
             if (vm.count("file") || vm.count("directory")) {
                 if (!fs::exists(fs::path(vm["database"].as<string>()))) {
-                    throw std::exception("database not found.");
+                    std::logic_error ex("database not found.");
+                    throw std::exception(ex);
                 }
                 string db = vm["database"].as<string>();
                 std::shared_ptr<Decoder> decoder(new Decoder(db));
@@ -223,15 +234,17 @@ int main(int argc, char **argv) {
                 if (vm.count("file")) {
                     //for single file
                     string file = vm["file"].as<string>();
-                    recognite(decoder, file, &vm, [&] (const CharSet& charset) {
-                        cout << file << " ----> " << charset;
+                    recognite(decoder, file, &vm, [&] (const CharSet &charset) {
+                        cout << file << " ----> ";
+						cout << charset;
                     });
                     break;
                 } else if (vm.count("directory")) {
                     //for batch recognition
                     string dir = vm["directory"].as<string>();
                     if (!fs::exists(fs::path(dir))) {
-                        throw std::exception("directory not found.");
+                        std::logic_error ex("directory not found.");
+                        throw std::exception(ex);
                     }
                     //traversal the folder
                     int right_count = 0, sumfile = 0;
@@ -244,7 +257,8 @@ int main(int argc, char **argv) {
                             string file = beg->path().string();
 
                             recognite(decoder, file, &vm, [&] (const CharSet &charset) {
-                                cout << file << " ----> " << charset << endl;
+                                cout << file << " ----> ";
+								cout << charset << endl;
                                 if (std::string(charset.begin(), charset.end())
                                     == fs::basename(fs::path(file))) {
                                     right_count++;
@@ -266,9 +280,10 @@ int main(int argc, char **argv) {
 
         } while (false);
 
-    } catch (std::exception& e) {
+    } catch (std::logic_error& e) {
         cout << e.what() << endl;
     }
 
     return 0;
 }
+

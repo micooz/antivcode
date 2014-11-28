@@ -4,12 +4,6 @@
 #include "Jpeg.h"
 #include "Database.h"
 
-std::ostream&
-operator<<(std::ostream &out, const  CharSet &charset) {
-    out << std::string(charset.begin(), charset.end());
-    return out;
-}
-
 Decoder::Decoder(const std::string &dbpath)
     :_db(nullptr) {
 
@@ -32,7 +26,8 @@ Decoder::decode(const std::string &file) {
     SliceCollection *col = _db->load();
 
     if (col->empty()) {
-        throw std::exception("database empty");
+		std::logic_error ex("database empty");
+        throw std::exception(ex);
     }
 
     std::shared_ptr<IImage> target(new Jpeg(file));

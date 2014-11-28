@@ -5,7 +5,7 @@
 
 std::ofstream&
 operator<<(std::ofstream &out, Slice *item) {
-    AttributeCode &code = item->getCode();
+    AttributeCode code = item->getCode();
     char symbol = item->getSymbol();
     size_t len = code.size();
 
