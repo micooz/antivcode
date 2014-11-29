@@ -92,7 +92,7 @@ void recognite(std::shared_ptr<Decoder> decoder, const string &file,
             cout << " × ";
         }
         clock_t now = clock();
-        cout << "duration: " << (now - time_start) << " ms" << endl;
+        cout << "duration: " << (double)(now - time_start) / (double)CLOCKS_PER_SEC * 1000  << " ms" << endl;
     }
 }
 
