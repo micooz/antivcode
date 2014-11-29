@@ -20,8 +20,8 @@ using namespace boost::program_options;
 namespace fs = boost::filesystem;
 
 std::ostream& operator<<(std::ostream &out, const CharSet &charset) {
-        out << std::string(charset.begin(), charset.end());
-        return out;
+    out << std::string(charset.begin(), charset.end());
+    return out;
 }
 
 void study(const string& file, std::shared_ptr<Study> sd, const variables_map *vm) {

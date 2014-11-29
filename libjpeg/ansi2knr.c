@@ -687,4 +687,3 @@ found:		if ( *p == '.' && p[-1] == '.' && p[-2] == '.' )
 	free((char *)breaks);
 	return 0;
 }
-
