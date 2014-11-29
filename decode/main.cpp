@@ -59,8 +59,7 @@ void study(const string& file, std::shared_ptr<Study> sd, const variables_map *v
         std::cin.clear();
         std::cin >> buf;
         if (buf[0] == 'q' && buf[1] == 0) {
-            std::logic_error ex("user abort.");
-            throw std::exception(ex);
+            throw std::logic_error("user abort.");
         }
     }
     for (size_t i = 0; i < psc->size(); i++) {
@@ -73,8 +72,7 @@ void recognite(std::shared_ptr<Decoder> decoder, const string &file,
     //check the file type
     string extension = fs::extension(fs::path(file));
     if (extension != ".jpg" && extension != ".jpeg") {
-        std::logic_error ex("invalid image format.");
-        throw std::exception(ex);
+        throw std::logic_error("invalid image format.");
     }
     //for test procedure
     bool testproc = (vm->count("test")) ? true : false;
@@ -184,8 +182,7 @@ int main(int argc, char **argv) {
             //study process
             if (vm.count("study")) {
                 if (!(vm.count("directory") || vm.count("file"))) {
-                    std::logic_error ex("-d or -f must be set.");
-                    throw std::exception(ex);
+                    throw std::logic_error("-d or -f must be set.");
                 }
 
                 fs::path dbpath(vm["database"].as<string>());
@@ -225,8 +222,7 @@ int main(int argc, char **argv) {
             //recognition process
             if (vm.count("file") || vm.count("directory")) {
                 if (!fs::exists(fs::path(vm["database"].as<string>()))) {
-                    std::logic_error ex("database not found.");
-                    throw std::exception(ex);
+                    throw std::logic_error("database not found.");
                 }
                 string db = vm["database"].as<string>();
                 std::shared_ptr<Decoder> decoder(new Decoder(db));
@@ -235,16 +231,14 @@ int main(int argc, char **argv) {
                     //for single file
                     string file = vm["file"].as<string>();
                     recognite(decoder, file, &vm, [&] (const CharSet &charset) {
-                        cout << file << " ----> ";
-						cout << charset;
+                        cout << file << " ----> " << charset;
                     });
                     break;
                 } else if (vm.count("directory")) {
                     //for batch recognition
                     string dir = vm["directory"].as<string>();
                     if (!fs::exists(fs::path(dir))) {
-                        std::logic_error ex("directory not found.");
-                        throw std::exception(ex);
+                        throw std::logic_error("directory not found.");
                     }
                     //traversal the folder
                     int right_count = 0, sumfile = 0;
@@ -257,8 +251,7 @@ int main(int argc, char **argv) {
                             string file = beg->path().string();
 
                             recognite(decoder, file, &vm, [&] (const CharSet &charset) {
-                                cout << file << " ----> ";
-								cout << charset << endl;
+                                cout << file << " ----> " << charset << endl;
                                 if (std::string(charset.begin(), charset.end())
                                     == fs::basename(fs::path(file))) {
                                     right_count++;

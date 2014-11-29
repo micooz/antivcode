@@ -11,8 +11,7 @@ Jpeg::Jpeg(const std::string &file)
 
     _pf = fopen(file.c_str(), "rb");
     if (_pf == nullptr) {
-		std::logic_error ex("file not found.");
-        throw std::exception(ex);
+        throw std::logic_error("file not found.");
     }
     jpeg_stdio_src(&_info, _pf);
     jpeg_read_header(&_info, true);
@@ -60,8 +59,7 @@ Jpeg::binaryZate() {
                 color.setRgb(0xff, 0xff, 0xff);
                 setPixel(x, y, color);
                 _lattice[y * _info.image_width + x] = false;
-            }
-            else {
+            } else {
                 color.setRgb(0x0, 0x0, 0x0);
                 setPixel(x, y, color);
                 _lattice[y * _info.image_width + x] = true;
