@@ -1,0 +1,3 @@
+1. add sample jpgs file in this folder and name each right words
+2. excute command "decode -syn -d Resource/samples"
+3. wait for auto generating a new sample database, to save database in a specified position,please set -b where/dbname
