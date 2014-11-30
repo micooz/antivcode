@@ -1,8 +1,41 @@
 #Antivcode
 
+An identification code validation procedures implement by C++ with boost and libjpeg.
+
+##Dependence
+* boost v1_56_0 http://www.boost.org/users/history/version_1_56_0.html
+* jpeglib v9(**included**) http://www.ijg.org/files/
+* gcc 4.8.2 or above
+* msvc compiler which support c++11
+##Compile
+
+####Linux
+
+Suppose you have compiled boost library in **/usr/local/boost_1_56_0/** as well as the **.a** static library are in
+**/usr/local/boost_1_56_0/stage/lib**.
+
+If not, you should probably modify the **Makefile**.
+
+When all of the work is finished,just do following steps:
+
+```
+>> cd ./libjpeg/
+>> make
+>> cd ../decode/
+>> make
+>> ./decode
+```
+
+####Windows
+* Open **.sln** file.
+* Configure include path of boost and libjpeg.
+* Compile libjpeg project first in the solution.
+* Configure attach library folder of boost and libjpeg.
+* Compile decode project.
+* F5 or Ctrl+F5 to run this application.
+
 #Usage
 
-###examples:
 First you should let the program study and generate attribute code database.
 
 To get help information:
