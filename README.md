@@ -2,6 +2,8 @@
 
 An identification code validation procedures implement by C++ with boost and libjpeg.
 
+Note: For *personal use* at present.
+
 ##Dependence
 * boost v1_56_0 http://www.boost.org/users/history/version_1_56_0.html
 * jpeglib v9(**included**) http://www.ijg.org/files/
@@ -88,3 +90,10 @@ To recognite a series of files:
 ```
 >> decode -d simples/
 ```
+#Author
+
+Micooz
+ 
+November 30, 2014 in Chengdu University of Technology.
+
+Contact me by e-mail: **micooz@hotmail.com**
