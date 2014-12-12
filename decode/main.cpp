@@ -231,7 +231,7 @@ int main(int argc, char **argv) {
                     //for single file
                     string file = vm["file"].as<string>();
                     recognite(decoder, file, &vm, [&] (const CharSet &charset) {
-                        cout << file << " ----> " << charset;
+                        cout << charset;
                     });
                     break;
                 } else if (vm.count("directory")) {
