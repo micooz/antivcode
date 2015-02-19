@@ -1,10 +1,11 @@
 Debug/
 Release/
+CMakeFiles/
+.idea/
 *.suo
 *.sdf
 *.opensdf
 *.diagsession
 *.vspx
-*.o
 *.a
 
