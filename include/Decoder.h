@@ -9,14 +9,15 @@ class Database;
 typedef std::vector<char> CharSet;
 
 class Decoder {
-public:
-    Decoder(const std::string &db);
-    ~Decoder();
+ public:
+  Decoder(const std::string& db);
 
-    CharSet decode(const std::string &file);
+  ~Decoder();
 
-private:
-    Database *_db;
+  CharSet decode(const std::string& file);
+
+ private:
+  Database* _db;
 };
 
 #endif //_DECODER_H_

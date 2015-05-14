@@ -4,21 +4,23 @@
 #include "typedef.h"
 
 class Color {
-public:
-    Color(byte r, byte g, byte b);
+ public:
+  Color(byte r, byte g, byte b);
 
-    //getter
-    byte r()const;
-    byte g()const;
-    byte b()const;
+  //getter
+  byte r() const;
 
-    //setter
-    void setRgb(byte r, byte g, byte b);
+  byte g() const;
 
-    bool operator > (const int &hex);
+  byte b() const;
 
-private:
-    byte _r, _g, _b;
+  //setter
+  void setRgb(byte r, byte g, byte b);
+
+  bool operator>(const int& hex);
+
+ private:
+  byte _r, _g, _b;
 };
 
 #endif //_COLOR_H_

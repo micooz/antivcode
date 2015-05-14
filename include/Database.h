@@ -8,17 +8,21 @@
 
 //provide attribute code storage algorithm.
 class Database {
-public:
-    Database(const std::string &root, const std::string &dbname);
-    ~Database();
+ public:
+  Database(const std::string& root, const std::string& dbname);
 
-    void add(std::shared_ptr<Slice> slice);
-    void save();
-    SliceCollection* load();
-private:
-    SliceCollection *_collection;
-    std::string _dbname;
-    std::string _root;
+  ~Database();
+
+  void add(std::shared_ptr<Slice> slice);
+
+  void save();
+
+  SliceCollection* load();
+
+ private:
+  SliceCollection* _collection;
+  std::string _dbname;
+  std::string _root;
 };
 
 #endif //_DATABASE_H_

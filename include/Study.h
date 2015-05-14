@@ -6,18 +6,22 @@
 #include <memory>
 
 class Slice;
+
 class Database;
 
 //to auto generate attribute code & save into file.
 class Study {
-public:
-    Study(const std::string &dbpath);
-    ~Study();
+ public:
+  Study(const std::string& dbpath);
 
-    void confirm(std::shared_ptr<Slice> slice, char symbol);
-    void finish();
-private:
-    Database *_db;
+  ~Study();
+
+  void confirm(std::shared_ptr<Slice> slice, char symbol);
+
+  void finish();
+
+ private:
+  Database* _db;
 };
 
 #endif //_STUDY_H_
