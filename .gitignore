@@ -9,3 +9,10 @@ CMakeFiles/
 *.vspx
 *.a
 
+# auto generated files in jpeg folder
+jpeg-9a/config.log
+jpeg-9a/config.status
+jpeg-9a/jconfig.h
+jpeg-9a/libtool
+jpeg-9a/Makefile
+jpeg-9a/stamp-h1
