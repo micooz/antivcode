@@ -5,9 +5,9 @@
 #endif
 
 #include <iostream>
-#include <memory>
 #include <fstream>
-#include <boost/program_options.hpp>
+#include <generator/generator.h>
+#include <parser/parser.h>
 #include <boost/filesystem.hpp>
 #include "IImage.h"
 #include "Jpeg.h"
@@ -15,7 +15,7 @@
 #include "Decoder.h"
 
 using namespace std;
-using namespace boost::program_options;
+using namespace program_options;
 
 namespace fs = boost::filesystem;
 
@@ -25,11 +25,11 @@ std::ostream& operator<<(std::ostream& out, const CharSet& charset) {
 }
 
 void study(const string& file, std::shared_ptr<Study> sd,
-           const variables_map* vm) {
+           Parser* parser) {
   char buf[10];
   memset(buf, 0, sizeof(buf));
 
-  if (vm->count("byname")) {
+  if (parser->has("byname")) {
     string fname = fs::basename(fs::path(file));
     strcpy(buf, fname.c_str());
   } else {
@@ -47,7 +47,7 @@ void study(const string& file, std::shared_ptr<Study> sd,
   jpeg->makeGray();
   jpeg->binaryZate();
 
-  if (vm->count("savetmp")) {
+  if (parser->has("savetmp")) {
     string tmpfile = file.substr(0, file.find_last_of('.')) + ".bmp";
     jpeg->saveTo(tmpfile);
   }
@@ -69,8 +69,8 @@ void study(const string& file, std::shared_ptr<Study> sd,
   }
 }
 
-void recognite(std::shared_ptr<Decoder> decoder, const string& file,
-               const variables_map* vm,
+void recognize(std::shared_ptr<Decoder> decoder, const string& file,
+               Parser* parser,
                const std::function<void(const CharSet&)> callback) {
   //check the file type
   string extension = fs::extension(fs::path(file));
@@ -78,7 +78,7 @@ void recognite(std::shared_ptr<Decoder> decoder, const string& file,
     throw std::logic_error("invalid image format.");
   }
   //for test procedure
-  bool testproc = (vm->count("test")) ? true : false;
+  bool testproc = parser->has("test");
   clock_t time_start = 0;
   if (testproc) {
     time_start = clock();
@@ -102,102 +102,45 @@ void recognite(std::shared_ptr<Decoder> decoder, const string& file,
   }
 }
 
-class examples {
- public:
-  static examples* getInstance() {
-    static examples* _obj = nullptr;
-    static gc _gc;
-
-    if (!_obj) {
-      _obj = new examples;
-    }
-    return _obj;
-  }
-
-  friend std::ostream& operator<<(std::ostream& out, const examples* obj) {
-    for (auto line : obj->_text) {
-      out << line << std::endl;
-    }
-    return out;
-  }
-
- private:
-  examples() {
-    _text.reserve(30);
-    ifstream in(_file, ios::in | ios::binary);
-
-    string buf;
-    if (in) {
-      while (!in.eof()) {
-        std::getline(in, buf);
-        _text.push_back(buf);
-      }
-      in.close();
-    }
-  }
-
-  class gc {
-   public:
-    ~gc() {
-      examples* pIns = examples::getInstance();
-      if (pIns) {
-        delete pIns;
-        pIns = nullptr;
-      }
-    }
-  };
-
-  vector<string> _text;
-  const string _file = "./examples";
-};
-
-int main(int argc, char** argv) {
+int main(int argc, const char** argv) {
 
 #if defined (WIN32) || (_WIN32)
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-  boost::program_options::options_description opts("decode Usage");
-  opts.add_options()
+  program_options::Generator opts;
+  opts.make_usage("antivcode usage:")
           ("help,h", "show help information")
           ("study,s", "auto create char map database, require -d or -f")
           ("byname,y", "study by filename without input manually")
-          ("directory,d", value<string>(),
-           "directory where vcode images saved in")
-          ("file,f", value<string>(), "vcode image path")
-          ("database,b", value<string>()->default_value("./db"),
-           "database file path")
+          ("directory,d", "", "directory where vcode images saved in")
+          ("file,f", "", "vcode image path")
+          ("database,b", "./db", "database file path")
           ("test,t", "run test procedure, require -d or -f")
           ("newdb,n", "create new database")
           ("savetmp,v", "save binaryzated file, require -s");
 
-  variables_map vm;
-  try {
-    store(parse_command_line(argc, argv, opts), vm);
-  } catch (exception& ex) {
-    cout << ex.what() << endl;
-    return -1;
-  }
-  notify(vm);
+  auto parser = opts.make_parser();
+  parser->parse(argc, argv);
 
   try {
     //circulate just once, only one exit at return 0
     do {
       //show help
-      if (vm.count("help")) {
-        cout << opts << examples::getInstance() << endl;
+      if (parser->has("help")) {
+        cout << opts << endl;
         break;
       }
 
       //study process
-      if (vm.count("study")) {
-        if (!(vm.count("directory") || vm.count("file"))) {
+      if (parser->has("study")) {
+        if (!parser->has_or({"directory", "file"})) {
           throw std::logic_error("-d or -f must be set.");
         }
 
-        fs::path dbpath(vm["database"].as<string>());
+        fs::path dbpath(parser->get("database")->val());
 
-        if (vm.count("newdb")) {
+        if (parser->has("newdb")) {
           if (fs::exists(dbpath)) {
             fs::remove(dbpath);
           }
@@ -205,8 +148,8 @@ int main(int argc, char** argv) {
 
         std::shared_ptr<Study> sd(new Study(dbpath.string()));
 
-        if (vm.count("directory")) {
-          fs::path dir(vm["directory"].as<string>());
+        if (parser->has("directory")) {
+          fs::path dir(parser->get("directory")->val());
           if (!fs::exists(dir)) {
             fs::create_directory(dir);
           }
@@ -215,39 +158,39 @@ int main(int argc, char** argv) {
           for (; beg != end; beg++) {
             string extension = fs::extension(fs::path(*beg));
             if (extension == ".jpg" || extension == ".jpeg") {
-              study(beg->path().string(), sd, &vm);
+              study(beg->path().string(), sd, parser);
             }
           }
-        } else if (vm.count("file")) {
-          study(vm["file"].as<string>(), sd, &vm);
+        } else if (parser->has("file")) {
+          study(parser->get("file")->val(), sd, parser);
         }
 
         sd->finish();
 
         cout << "study finished, database saved at " <<
-        vm["database"].as<string>() << endl;
+        parser->get("database")->val() << endl;
 
         break;
       }
 
       //recognition process
-      if (vm.count("file") || vm.count("directory")) {
-        if (!fs::exists(fs::path(vm["database"].as<string>()))) {
+      if (parser->has("file") || parser->has("directory")) {
+        if (!fs::exists(fs::path(parser->get("database")->val()))) {
           throw std::logic_error("database not found.");
         }
-        string db = vm["database"].as<string>();
+        string db = parser->get("database")->val();
         std::shared_ptr<Decoder> decoder(new Decoder(db));
 
-        if (vm.count("file")) {
+        if (parser->has("file")) {
           //for single file
-          string file = vm["file"].as<string>();
-          recognite(decoder, file, &vm, [&](const CharSet& charset) {
+          string file = parser->get("file")->val();
+          recognize(decoder, file, parser, [&](const CharSet& charset) {
             cout << charset;
           });
           break;
-        } else if (vm.count("directory")) {
+        } else if (parser->has("directory")) {
           //for batch recognition
-          string dir = vm["directory"].as<string>();
+          string dir = parser->get("directory")->val();
           if (!fs::exists(fs::path(dir))) {
             throw std::logic_error("directory not found.");
           }
@@ -261,7 +204,7 @@ int main(int argc, char** argv) {
 
               string file = beg->path().string();
 
-              recognite(decoder, file, &vm, [&](const CharSet& charset) {
+              recognize(decoder, file, parser, [&](const CharSet& charset) {
                 cout << file << " ----> " << charset << endl;
                 if (std::string(charset.begin(), charset.end())
                     == fs::basename(fs::path(file))) {
@@ -280,7 +223,7 @@ int main(int argc, char** argv) {
         }//if
       }
 
-      cout << opts << examples::getInstance() << endl;
+      cout << opts << endl;
 
     } while (false);
 
