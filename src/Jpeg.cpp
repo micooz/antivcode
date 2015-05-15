@@ -1,5 +1,4 @@
 #include <iostream>
-#include <memory>
 #include "Jpeg.h"
 #include "Bitmap.h"
 
@@ -14,7 +13,7 @@ Jpeg::Jpeg(const std::string& file)
     throw std::logic_error("file not found.");
   }
   jpeg_stdio_src(&_info, _pf);
-  jpeg_read_header(&_info, true);
+  jpeg_read_header(&_info, boolean::TRUE);
 
   _data = new byte[_info.image_width * _info.image_height *
                    _info.num_components];
@@ -24,7 +23,7 @@ Jpeg::Jpeg(const std::string& file)
   int i = 0;
   while (_info.output_scanline < _info.image_height) {
     pLine = _data + i++ * _info.image_width * _info.num_components;
-    jpeg_read_scanlines(&_info, &pLine, 1);
+    jpeg_read_scanlines(&_info, (JSAMPARRAY)&pLine, 1);
   }
   jpeg_finish_decompress(&_info);
 }

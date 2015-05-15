@@ -23,7 +23,7 @@ class Jpeg :
 
   std::shared_ptr<SliceCollection> cut();
 
-  AttributeCode getCode();
+  // AttributeCode getCode();
 
   void saveTo(const std::string& file);
 
@@ -35,7 +35,7 @@ class Jpeg :
   FILE* _pf;
   jpeg_decompress_struct _info;
   jpeg_error_mgr _jerr;
-  byte* _raw;
+  // byte* _raw;
 };
 
 #endif //_JPEG_H_

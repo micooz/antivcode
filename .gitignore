@@ -11,19 +11,19 @@ CMakeFiles/
 *.a
 
 # auto generated files in jpeg folder
-jpeg-9a/.deps/
-jpeg-9a/.libs/
-jpeg-9a/config.log
-jpeg-9a/config.status
-jpeg-9a/jconfig.h
-jpeg-9a/libtool
-jpeg-9a/Makefile
-jpeg-9a/stamp-h1
-jpeg-9a/*.o
-jpeg-9a/*.lo
-jpeg-9a/cjpeg
-jpeg-9a/djpeg
-jpeg-9a/jpegtran
-jpeg-9a/libjpeg.la
-jpeg-9a/rdjpgcom
-jpeg-9a/wrjpgcom
+vendor/jpeg-9a/.deps/
+vendor/jpeg-9a/.libs/
+vendor/jpeg-9a/config.log
+vendor/jpeg-9a/config.status
+vendor/jpeg-9a/jconfig.h
+vendor/jpeg-9a/libtool
+vendor/jpeg-9a/Makefile
+vendor/jpeg-9a/stamp-h1
+vendor/jpeg-9a/*.o
+vendor/jpeg-9a/*.lo
+vendor/jpeg-9a/cjpeg
+vendor/jpeg-9a/djpeg
+vendor/jpeg-9a/jpegtran
+vendor/jpeg-9a/libjpeg.la
+vendor/jpeg-9a/rdjpgcom
+vendor/jpeg-9a/wrjpgcom
