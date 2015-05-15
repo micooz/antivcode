@@ -1,0 +1,20 @@
+# CLion
+.idea/
+
+# binary
+bin/
+
+# cmake
+CMakeFiles/
+CMakeScripts/
+CMakeCache.txt
+*.user
+
+# Xcode
+Debug/
+Release/
+.build/
+*.xcodeproj
+
+# gtest
+Testing/
