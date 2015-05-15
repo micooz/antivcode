@@ -110,15 +110,15 @@ int main(int argc, const char** argv) {
 
   program_options::Generator opts;
   opts.make_usage("antivcode usage:")
-          ("help,h", "show help information")
-          ("study,s", "auto create char map database, require -d or -f")
-          ("byname,y", "study by filename without input manually")
-          ("directory,d", "", "directory where vcode images saved in")
-          ("file,f", "", "vcode image path")
-          ("database,b", "./db", "database file path")
-          ("test,t", "run test procedure, require -d or -f")
-          ("newdb,n", "create new database")
-          ("savetmp,v", "save binaryzated file, require -s");
+          ("h,help", "show help information")
+          ("s,study", "auto create char map database, require -d or -f")
+          ("y,byname", "study by filename without input manually")
+          ("d,directory", "", "directory where vcode images saved in")
+          ("f,file", "", "vcode image path")
+          ("b,database", "./db", "database file path")
+          ("t,test", "run test procedure, require -d or -f")
+          ("n,newdb", "create new database")
+          ("v,savetmp", "save binaryzated file, require -s");
 
   auto parser = opts.make_parser();
   parser->parse(argc, argv);

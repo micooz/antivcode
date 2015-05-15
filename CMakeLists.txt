@@ -8,13 +8,17 @@ include_directories(vendor/ProgramOptions/include)
 include_directories(vendor/jpeg-9a)
 
 aux_source_directory(src SOURCE_FILES)
-
 add_subdirectory(vendor/ProgramOptions)
 
 find_package(Boost COMPONENTS filesystem system REQUIRED)
+find_library(JPEG_LIBRARY
+    NAMES jpeg
+    HINTS "vendor/jpeg-9a/.libs"
+)
 
-find_library(LIBJPEG NAMES jpeg HINTS jpeg-9a)
 add_executable(antivcode ${SOURCE_FILES})
-
-target_link_libraries (antivcode ${Boost_LIBRARIES} ${LIBJPEG})
-target_link_libraries(antivcode program_options jpeg)
+target_link_libraries(antivcode
+    program_options
+    ${Boost_LIBRARIES}
+    ${JPEG_LIBRARY}
+)
